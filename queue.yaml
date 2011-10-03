@@ -1,0 +1,11 @@
+queue:
+- name: update
+  rate: 12/h
+
+- name: game 
+  rate: 12/m
+  retry_parameters:
+    task_retry_limit: 1
+
+- name: invite
+  rate: 12/h

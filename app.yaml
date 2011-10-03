@@ -1,0 +1,25 @@
+application: feudbot
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /game
+  script: main.py
+  login: admin
+
+- url: /invite
+  script: main.py
+  login: admin
+
+- url: /update
+  script: main.py
+  login: admin
+
+- url: /_ereporter.*
+  script: $PYTHON_LIB/google/appengine/ext/ereporter/report_generator.py
+  login: admin
+
+- url: .*
+  script: main.py
+
