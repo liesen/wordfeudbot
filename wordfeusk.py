@@ -46,7 +46,8 @@ class Wordfeusk(object):
             log.debug("No words in reply")
 
     def _format_letters(self, rack):
-        return ''.join(map(lambda x: x.lower(), rack)).encode('utf-8')
+        letter = lambda x: '*' if len(x) == 0 else x.lower()
+        return ''.join(map(letter, rack)).encode('utf-8')
 
     def _format_board(self, tiles):
         board = dict([((x, y), letter) for x, y, letter, blank in tiles])
