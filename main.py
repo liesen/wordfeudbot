@@ -52,7 +52,7 @@ class UpdateHandler(webapp.RequestHandler):
                           url='/invite',
                           params=dict(content=json.dumps(invite)))
 
-        countdown = random.randint(2*60, 5*60)
+        countdown = random.randint(1*60, 3*60)
         last_updated = datetime.now()
         next_update = last_updated + timedelta(seconds=countdown)
         self.schedule(countdown)
