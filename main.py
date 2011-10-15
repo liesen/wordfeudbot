@@ -133,7 +133,7 @@ class InviteHandler(webapp.RequestHandler):
         invite = json.loads(self.request.get('content'))
         log.debug('Received invite: %s', invite)
 
-        if invite.get('board_type', 'normal') == 'normal' and invite.get('ruleset', 0) == 4:
+        if invite.get('ruleset', 0) == 4:
             W.accept_invitation(invite.get('id'))
             log.debug('Accepted invitation from %s', invite.get('inviter'))
         else:

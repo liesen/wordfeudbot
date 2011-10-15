@@ -236,6 +236,8 @@ class Game(GameStatus):
         self.pass_count = self.game.get('pass_count')
         self.ruleset = self.game.get('ruleset')
 
+        self.board_type = 'normal' if self.board == 1 else 'random'
+
         self.me = None
         self.opponents = []
 
@@ -256,8 +258,22 @@ class Game(GameStatus):
     def get_board_squares(self):
         '''Returns the premium tiles of the board.'''
         action = 'board/%s/' % self.board
+
+        if appengine:
+            board = memcache.get(action)
+
+            if board:
+                log.debug('Board %d found in cache' % self.board)
+                return board
+
+        log.debug('Fetch board %d from Wordfeud' % self.board)
         resp = self.wordfeud._post_json(action)
-        return check_status(resp, lambda x: x.get('board'))
+        board = check_status(resp, lambda x: x.get('board'))
+
+        if appengine:
+            memcache.set(action, board)
+
+        return board
 
     def is_my_turn(self):
         return self.me.position == self.current_player

@@ -19,11 +19,16 @@ class Wordfeusk(object):
         pass
 
     def get_moves(self, game):
-        return self._get_moves(game.tiles, game.me.rack)
+        rack = game.me.rack
+        tiles = game.tiles
 
-    def _get_moves(self, tiles, rack):
         form_data = dict(letters=self._format_letters(rack),
                          board=self._format_board(tiles))
+
+        # Only send bonuses if board is random
+        if game.board_type == 'random':
+            form_data['bonuses'] = self._format_bonuses(game)
+
         log.debug("Attempting Wordfeusk with %s" % form_data)
         data = urllib.urlencode(form_data)
 
@@ -60,4 +65,8 @@ class Wordfeusk(object):
                     range(0, 15))
         return json.dumps(lines, ensure_ascii=False) 
 
+    def _format_bonuses(self, game):
+        board = game.get_board_squares()
+        bonuses = [''.join(map(lambda x: ' lLwW'[x], row)) for row in board]
+        return json.dumps(bonuses, ensure_ascii=False)
 
