@@ -85,6 +85,11 @@ def login_by_username(username, password):
     return check_status(resp, Wordfeud)
 
 
+class WordfeudError(Exception):
+    def __init__(self, error):
+        self.message = error.get('message', '')
+        self.type = error.get('type')
+
 class Wordfeud:
     def __init__(self, userdata):
         self.userdata = userdata
@@ -111,6 +116,7 @@ class Wordfeud:
                 return post_json(action, json_data)
             else:
                 log.warn("Error communicating with Wordfeud: %s" % error)
+                raise WordfeudError(error)
         else:
             return resp
 

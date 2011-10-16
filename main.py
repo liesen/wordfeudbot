@@ -120,7 +120,13 @@ class GameHandler(webapp.RequestHandler):
             try:
                 g.play(move.word, move.x0, move.y0, move.direction)
                 return
-            except:
+            except WordfeudError, e:
+                if e.message == 'not_your_turn':
+                    log.info('Apparently not my turn')
+                    return
+
+                continue
+            else:
                 continue
         else:
             log.debug("Wordfeusk didn't find a word to play... crap.")
