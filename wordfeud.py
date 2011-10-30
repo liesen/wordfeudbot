@@ -362,8 +362,11 @@ class Game(GameStatus):
         # Update rack
         new_rack = list(self.me.rack)
     
-        for letter in map(lambda x: x[2], move): new_rack.remove(letter)
-        for letter in update.get('new_tiles', []): new_rack.append(letter)
+        for letter in map(lambda x: '*' if x[3] else x[2], move):
+            new_rack.remove(letter)
+
+        for letter in update.get('new_tiles', []):
+            new_rack.append(letter)
 
         new_me = dict(self.me.data)
         new_me.update(score=self.me.score + update.get('points', 0),
