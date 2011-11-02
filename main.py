@@ -73,19 +73,20 @@ class GameHandler(webapp.RequestHandler):
         g = s.get_game()
 
         if not g.is_running:
-            if g.last_move.get('move_type', '') == 'resign':
-                tie = False
-                win = g.last_move.get('user_id') != g.me.id
+            outcome = 0
+
+            if g.last_move.get('move_type') == 'resign':
+                outcome == 1 if g.last_move.get('user_id') != g.me.id else -1
             else:
                 oppenents_best_score = max(map(lambda x: x.score, g.opponents))
-                tie = g.me.score == oppenents_best_score
-                win = not tie and g.me.score > oppenents_best_score 
+                outcome = cmp(g.me.score, oppenents_best_score)
 
-            log.debug('Game is dead. I %s', 'won :)' if win else 'lost :(')
+            log.debug('Game is dead. %s',
+                      ['I lost :(', 'We tied :|', 'I won :)'][outcome + 1])
 
-            if tie:
+            if outcome == 0:
                 stats.increment_tie_count()
-            elif win:
+            elif outcome == 1:
                 stats.increment_win_count()
             else:
                 stats.increment_lose_count()
@@ -95,7 +96,7 @@ class GameHandler(webapp.RequestHandler):
                                       updated=g.updated, created=g.created,
                                       players=g.players, move_count=g.move_count,
                                       board=g.board, ruleset=g.ruleset, tiles=g.tiles,
-                                      end_game=g.end_game, win=win))
+                                      end_game=g.end_game, outcome=outcome))
 
             for player in g.players:
                 db.put_async(User(key_name=str(player.get('id')), id=player.get('id'),

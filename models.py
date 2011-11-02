@@ -30,7 +30,7 @@ class FinishedGame(db.Model):
     ruleset = db.IntegerProperty()
     tiles = JsonProperty() 
     end_game = db.IntegerProperty()
-    win = db.BooleanProperty()
+    outcome = db.IntegerProperty()  # -1 = loss, 0 = tie, 1 = win
 
 
 class User(db.Model):
