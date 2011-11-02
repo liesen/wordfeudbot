@@ -351,7 +351,8 @@ class Game(GameStatus):
         board = self.get_board()
         w = Word(word, x0, y0, direction)
         move = w.get_move(board)
-        log.debug("Want to play: %s" % move)
+        log.debug('Have: %s', self.me.rack)
+        log.debug('Want to play: %s', move)
         action = 'game/%d/move/' % self.id
         json_data = json.dumps(dict(ruleset=self.ruleset,
                                     words=[word.upper()],
@@ -362,7 +363,7 @@ class Game(GameStatus):
         # Update rack
         new_rack = list(self.me.rack)
     
-        for letter in map(lambda x: '*' if x[3] else x[2], move):
+        for letter in map(lambda x: '' if x[3] else x[2], move):
             new_rack.remove(letter)
 
         for letter in update.get('new_tiles', []):
