@@ -161,7 +161,7 @@ class Player:
         self.position = playerdata.get('position')
         self.score = playerdata.get('score')
         self.id = playerdata.get('id')
-        self.rack = playerdata.get('rack', None)
+        self.rack = playerdata.get('rack', [])
 
 
 class Word:
