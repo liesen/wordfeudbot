@@ -108,11 +108,6 @@ class GameHandler(webapp.RequestHandler):
             log.debug("Not my turn")
             return
 
-        if len(g.tiles) == 0:
-            log.debug("Board is empty, playing something stupid")
-            g.bot_play()
-            return
-
         player = Wordfeusk()
 
         for move in itertools.islice(player.get_moves(g), 3):
