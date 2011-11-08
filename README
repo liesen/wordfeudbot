@@ -1,1 +1,4 @@
-The bot is running as long as there's a task in the update-queue. To bootstrap: put a task in the update-queue by issuing a POST to /update (on GAE this is rather tricky; you can use cURL, do a login and keep a few of cookies).
+The bot is running as long as there's a task in the update-queue.
+
+To bootstrap: put a task in the update-queue by issuing a POST to /update. This can be done using bootstrap.sh.
+
