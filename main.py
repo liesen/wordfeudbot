@@ -76,7 +76,7 @@ class GameHandler(webapp.RequestHandler):
             outcome = 0
 
             if g.last_move.get('move_type') == 'resign':
-                outcome == 1 if g.last_move.get('user_id') != g.me.id else -1
+                outcome = 1 if g.last_move.get('user_id') != g.me.id else -1
             else:
                 oppenents_best_score = max(map(lambda x: x.score, g.opponents))
                 outcome = cmp(g.me.score, oppenents_best_score)
