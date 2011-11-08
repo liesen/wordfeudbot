@@ -22,7 +22,8 @@ class Wordfeusk(object):
         rack = game.me.rack
         tiles = game.tiles
 
-        form_data = dict(letters=self._format_letters(rack),
+        form_data = dict(apikey='ladyboner',
+                         letters=self._format_letters(rack),
                          board=self._format_board(tiles))
 
         # Only send bonuses if board is random
