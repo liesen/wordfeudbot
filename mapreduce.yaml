@@ -6,3 +6,11 @@ mapreduce:
     params:
     - name: entity_kind 
       default: models.FinishedGame
+
+- name: Count outcomes
+  mapper:
+    input_reader: google.appengine.ext.mapreduce.input_readers.DatastoreInputReader
+    handler: mapred.outcome_report.process
+    params:
+    - name: entity_kind
+      default: models.FinishedGame
