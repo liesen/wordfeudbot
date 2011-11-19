@@ -66,7 +66,7 @@ def check_status(resp, f=None):
 def create_user(username, email, password):
     action = 'user/create/'
     data = json.dumps(dict(username=username, email=email, password=password))
-    resp, cookie = post_json(action, data, cookie)
+    resp, cookie = post_json(action, data)
     return check_status(resp), cookie
 
 def login_by_username(username, password):
