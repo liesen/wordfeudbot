@@ -107,12 +107,13 @@ class Wordfeud:
             if error.get('type') == 'login_required':
                 session = login_by_username(config.username, config.password)
                 self.__init__(session.cookie, session.userdata)
-                return post_json(action, json_data, self.cookie)
+                resp, cookie = post_json(action, json_data, self.cookie)
             else:
                 log.warn("Error communicating with Wordfeud: %s" % error)
                 raise WordfeudError(error)
-        else:
-            return resp
+
+        self.cookie = cookie
+        return resp
 
     def list_games(self):
         action = 'user/games/'
