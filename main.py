@@ -121,9 +121,7 @@ class GameHandler(webapp.RequestHandler):
                     log.info('Apparently not my turn')
                     return
 
-                continue
-            else:
-                continue
+                log.exception(e)
         else:
             log.debug("Wordfeusk didn't find a word to play... crap.")
 
