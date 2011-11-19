@@ -1,0 +1,8 @@
+mapreduce:
+- name: Fix games set to ties that aren't ties 
+  mapper:
+    input_reader: google.appengine.ext.mapreduce.input_readers.DatastoreInputReader
+    handler: mapred.fix_erroneous_ties.process
+    params:
+    - name: entity_kind 
+      default: models.FinishedGame
