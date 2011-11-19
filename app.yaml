@@ -4,6 +4,10 @@ runtime: python
 api_version: 1
 
 handlers:
+- url: /mapreduce(/.*)?
+  script: $PYTHON_LIB/google/appengine/ext/mapreduce/main.py
+  login: admin
+
 - url: /game
   script: main.py
   login: admin
