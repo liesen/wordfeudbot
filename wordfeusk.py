@@ -23,6 +23,7 @@ class Wordfeusk(object):
         tiles = game.tiles
 
         form_data = dict(apikey='ladyboner',
+                         ruleset=game.ruleset,
                          letters=self._format_letters(rack),
                          board=self._format_board(tiles))
 
