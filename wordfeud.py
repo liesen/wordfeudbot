@@ -19,7 +19,6 @@ except ImportError:
     from google.appengine.api import memcache
     appengine = True
 
-from words import words
 
 def get_host():
     return 'game%02d.wordfeud.com' % random.randint(0, 5)
@@ -283,66 +282,6 @@ class Game(GameStatus):
 
     def get_board(self):
         return Board(self.tiles)
-
-    def get_best_word(self):
-        board = self.get_board()
-
-        if len(board) == 0:
-            return self._get_best_word_empty()
-        else:
-            return itertools.chain(self._get_best_word(board, Word.ACROSS),
-                                   self._get_best_word(board.transpose(), Word.DOWN))
-
-    def _get_best_word_empty(self):
-        for first_letter in self.me.rack:
-            new_rack = list(self.me.rack)
-            new_rack.remove(first_letter)
-
-            for second_letter in new_rack:
-                word = first_letter + second_letter
-                i = bisect.bisect_left(words, word)
-
-                if i != len(words) and words[i] == word:
-                    yield word, 7, 7, Word.ACROSS
-                    yield word, 7, 7, Word.DOWN
-
-    def _get_best_word(self, board, direction):
-        for y in range(0, 15 - 1):
-            for x in range(0, 15 - 1):
-                if (x, y) in board:
-                    first_letter = board[(x, y)]
-                    words = []
-
-                    for second_letter in self.me.rack:
-                        word = first_letter + second_letter
-                        i = bisect.bisect_left(words, word)
-                        
-                        if i != len(words) and words[i] == word:
-                            words.append(word)
-
-                    for ny in [y + 1]:
-                        if (x, ny) in board:
-                            continue
-
-                        for word in words:
-                            yield word, x, y, Word.DOWN
-
-                    for nx in [x + 1]:
-                        if (nx, y) in board:
-                            continue
-
-                        for word in words:
-                            yield word, x, y, Word.ACROSS
-
-    def bot_play(self):
-        for word, x, y, direction in sorted(self.get_best_word(),
-                                            key=lambda w: score_word(w[0])):
-            try:
-                return self.play(word.lower(), x, y, direction)
-            except:
-                pass
-        else:
-            self.pass_()
 
     def play(self, word, x0, y0, direction):
         board = self.get_board()
