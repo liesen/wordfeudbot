@@ -46,8 +46,6 @@ def post_json(action, json_data='', cookie=None):
     cookie.load(cookie_str)
 
     if appengine:
-        memcache.set('wordfeud_cookie', cookie_str, 12 * 60 * 60)
-
         try:
             return json.loads(resp.content), cookie
         except ValueError:
