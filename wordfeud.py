@@ -134,9 +134,8 @@ class WordfeudSession:
 
 class Status:
     def __init__(self, session, statusdata):
-        self.session = session
         self.statusdata = statusdata
-        self.games = map(lambda x: GameStatus(wordfeud, x), statusdata.get('games', []))
+        self.games = map(lambda x: GameStatus(session, x), statusdata.get('games', []))
         self.invites_sent = statusdata.get('invites_sent', [])
         self.invites_received = statusdata.get('invites_received', [])
 
