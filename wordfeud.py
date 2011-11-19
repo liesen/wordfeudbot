@@ -73,7 +73,7 @@ def login_by_username(username, password):
     action = 'user/login/'
     data = json.dumps(dict(username=username, password=password))
     resp, cookie = post_json(action, data)
-    return check_status(resp, lambda x: Wordfeud(cookie, x))
+    return check_status(resp, lambda x: WordfeudSession(cookie, x))
 
 
 class WordfeudError(Exception):
@@ -82,7 +82,7 @@ class WordfeudError(Exception):
         self.type = error.get('type')
 
 
-class Wordfeud:
+class WordfeudSession:
     def __init__(self, cookie, userdata):
         self.cookie = cookie
         self.userdata = userdata
@@ -133,7 +133,8 @@ class Wordfeud:
 
 
 class Status:
-    def __init__(self, wordfeud, statusdata):
+    def __init__(self, session, statusdata):
+        self.session = session
         self.statusdata = statusdata
         self.games = map(lambda x: GameStatus(wordfeud, x), statusdata.get('games', []))
         self.invites_sent = statusdata.get('invites_sent', [])
@@ -201,8 +202,8 @@ class Word:
 
 
 class GameStatus(object):
-    def __init__(self, wordfeud, gamedata):
-        self.wordfeud = wordfeud
+    def __init__(self, session, gamedata):
+        self.session = session
         self.gamedata = gamedata
         self.id = gamedata.get('id')
         self.updated = datetime.fromtimestamp(gamedata.get('updated'))
@@ -210,16 +211,16 @@ class GameStatus(object):
 
     def get_game(self):
         action = 'game/%d/' % self.id
-        resp = self.wordfeud._post_json(action)
-        return check_status(resp, lambda x: Game(self.wordfeud, x))
+        resp = self.session._post_json(action)
+        return check_status(resp, lambda x: Game(self.session, x))
 
 
 class Game(GameStatus):
-    def __init__(self, wordfeud, gamedata):
+    def __init__(self, session, gamedata):
         self.gamedata = gamedata
         self.game = gamedata.get('game')
 
-        super(Game, self).__init__(wordfeud, self.game)
+        super(Game, self).__init__(session, self.game)
 
         # self.id = self.game.get('id')
         # self.updated = datetime.fromtimestamp(self.game.get('updated'))
@@ -245,7 +246,7 @@ class Game(GameStatus):
         for player in self.players:
             player = Player(player)
 
-            if player.id == wordfeud.id:
+            if player.id == session.id:
                 self.me = player
             else:
                 self.opponents.append(player)
@@ -253,7 +254,7 @@ class Game(GameStatus):
     def get_tile_points(self):
         '''Returns the points awarded for individual tiles/letters.'''
         action = 'tile_points/%s/' % self.ruleset
-        resp = self.wordfeud._post_json(action)
+        resp = self.session._post_json(action)
         return check_status(resp, lambda x: x.get('tile_points'))
 
     def get_board_squares(self):
@@ -268,7 +269,7 @@ class Game(GameStatus):
                 return board
 
         log.debug('Fetch board %d from Wordfeud' % self.board)
-        resp = self.wordfeud._post_json(action)
+        resp = self.session._post_json(action)
         board = check_status(resp, lambda x: x.get('board'))
 
         if appengine:
@@ -292,7 +293,7 @@ class Game(GameStatus):
         json_data = json.dumps(dict(ruleset=self.ruleset,
                                     words=[word.upper()],
                                     move=move))
-        resp = self.wordfeud._post_json(action, json_data) 
+        resp = self.session._post_json(action, json_data)
         update = check_status(resp)
 
         # Update rack
@@ -310,16 +311,16 @@ class Game(GameStatus):
         new_game = dict(self.game)
         new_game.update(updated=update.get('updated'),
                         players=[new_me] + map(lambda p: p.data, self.opponents))
-        return Game(self.wordfeud, dict(game=new_game))
+        return Game(self.session, dict(game=new_game))
 
     def pass_(self):
         action = 'game/%d/pass/' % self.id
-        resp = self.wordfeud._post_json(action)
+        resp = self.session._post_json(action)
         return check_status(resp)
 
     def resign(self):
         action = 'game/%d/resign/' % self.id
-        resp = self.wordfeud._post_json(action)
+        resp = self.session._post_json(action)
         return check_status(resp)
 
 
