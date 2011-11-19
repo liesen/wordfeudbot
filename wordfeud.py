@@ -21,21 +21,16 @@ except ImportError:
 
 from words import words
 
-cookie = Cookie.SimpleCookie()
-
-if appengine:
-    cached_cookie_value = memcache.get('wordfeud_cookie')
-
-    if cached_cookie_value is not None:
-        cookie.load(cached_cookie_value)
-
 def get_host():
     return 'game%02d.wordfeud.com' % random.randint(0, 5)
 
 def get_base_url():
     return 'http://' + get_host() + '/wf/'
 
-def post_json(action, json_data=''):
+def post_json(action, json_data='', cookie=None):
+    if cookie is None:
+        cookie = Cookie.SimpleCookie()
+
     cookie_str = cookie.output(header='')
     headers = {'Content-type': 'application/json',
                'From': 'johanliesen@gmail.com',
@@ -55,12 +50,12 @@ def post_json(action, json_data=''):
         memcache.set('wordfeud_cookie', cookie_str, 12 * 60 * 60)
 
         try:
-            return json.loads(resp.content)
+            return json.loads(resp.content), cookie
         except ValueError:
             log.error("Bad response: %s" % resp.content)
             raise
     else:
-        return json.load(resp)
+        return json.load(resp), cookie
 
 def check_status(resp, f=None):
     if resp.get('status', 'error') == 'success':
@@ -71,18 +66,17 @@ def check_status(resp, f=None):
 
     raise Exception(resp.get('content'))
 
-
 def create_user(username, email, password):
     action = 'user/create/'
     data = json.dumps(dict(username=username, email=email, password=password))
-    resp = post_json(action, data)
-    return check_status(resp)
+    resp, cookie = post_json(action, data, cookie)
+    return check_status(resp), cookie
 
 def login_by_username(username, password):
     action = 'user/login/'
     data = json.dumps(dict(username=username, password=password))
-    resp = post_json(action, data)
-    return check_status(resp, Wordfeud)
+    resp, cookie = post_json(action, data)
+    return check_status(resp, lambda x: Wordfeud(cookie, x))
 
 
 class WordfeudError(Exception):
@@ -90,8 +84,10 @@ class WordfeudError(Exception):
         self.message = error.get('message', '')
         self.type = error.get('type')
 
+
 class Wordfeud:
-    def __init__(self, userdata):
+    def __init__(self, cookie, userdata):
+        self.cookie = cookie
         self.userdata = userdata
         self.id = self.userdata.get('id')
         self.username = userdata.get('username')
@@ -106,14 +102,15 @@ class Wordfeud:
         return check_status(resp, lambda s: Status(self, s))
 
     def _post_json(self, action, json_data=''):
-        resp = post_json(action, json_data)
+        resp, cookie = post_json(action, json_data, self.cookie)
 
         if resp.get('status', 'success') == 'error':
             error = resp.get('content')
 
             if error.get('type') == 'login_required':
-                self.__init__(login_by_username(config.username, config.password).userdata)
-                return post_json(action, json_data)
+                session = login_by_username(config.username, config.password)
+                self.__init__(session.cookie, session.userdata)
+                return post_json(action, json_data, self.cookie)
             else:
                 log.warn("Error communicating with Wordfeud: %s" % error)
                 raise WordfeudError(error)
