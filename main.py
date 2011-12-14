@@ -16,6 +16,7 @@ import itertools
 import logging as log
 import random
 import statistics as stats
+import config
 
 ereporter.register_logger()
 
