@@ -1,4 +1,8 @@
-The bot is running as long as there's a task in the update-queue.
+Computer player (or bot) for Wordfeud.
+
+Running on Google AppEngine.
 
 To bootstrap: put a task in the update-queue by issuing a POST to /update. This can be done using bootstrap.sh.
+
+The bot is running as long as there's a task in the update-queue.
 
