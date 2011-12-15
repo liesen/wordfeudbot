@@ -107,7 +107,7 @@ class WordfeudSession:
             error = resp.get('content')
 
             if error.get('type') == 'login_required':
-                session = login_by_username(config.username, config.username)
+                session = login_by_username(config.username, config.password)
                 self.__init__(session.cookie, session.userdata)
                 resp, cookie = post_json(action, json_data, self.cookie)
             else:
