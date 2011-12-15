@@ -23,4 +23,4 @@ COOKIE=`curl -s -f --head "http://$APP.appspot.com/_ah/login?auth=$AUTH"`
 COOKIE=`echo "$COOKIE" | grep -E '^Set-Cookie: ' | sed 's/^Set-Cookie: \([^;]*\).*/\1/'`
 
 # Do empty POST to /update to trigger an update
-curl -X POST -d "" -H "Cookie: $COOKIE" http://feudbot.appspot.com/update 
+curl -X POST -d "" -H "Cookie: $COOKIE" "http://$APP.appspot.com/update"
