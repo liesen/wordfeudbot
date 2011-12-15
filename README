@@ -1,9 +1,21 @@
 Computer player (or bot) for Wordfeud. Runs on Google AppEngine.
 
-To bootstrap: put a task in the update-queue by issuing a POST 
-to /update. This can be done using bootstrap.sh.
+To find out what words to play, the bot asks Wordfeusk (http://www.wordfeusk.se)
+for a list of valid words given the current rack and board.
 
-The bot is running as long as there's a task in the update-queue.
+Only Swedish is currently supported, but if you feel like it challenge
+"ladyboner" (without quotes). The bot wins about 85% of all games.
+
+
+RUNNING IT
+==========
+You need a Wordfeud account in config.py.
+
+Publish the code to an AppEngine app.
+
+To bootstrap: put a task in the update-queue by issuing a POST 
+to /update. This is a bit involved: see bootstrap.sh. The bot is 
+running as long as there's a task in the update-queue.
 
 
 LICENSE
